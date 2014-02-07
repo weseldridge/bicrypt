@@ -22,6 +22,47 @@ class BiCrypt {
 	}
 
 	/**
+	* Will create an encypted string
+	*
+	* This method will create the key, iv, and encrypted string. This process is expected 
+	*
+	* @param string $item The password or item you want to encrypt
+	* @return array An array includeding the the encryption key, the iv, and the encrypted item
+	*/
+	public function encrypt($item, $encode=BIN, $cipher=MCRYPT_RIJNDAEL_128, $mode=MCRYPT_MODE_CFB)
+	{
+		$key = $this->generate_key($cipher, $mode);
+		$iv = $this->generate_initialisation_vector($cipher, $mode);
+		$encrypted_item = mcrypt_encrypt($cipher, $key, $item, $mode, $iv);
+
+		return array(
+			'key' => $this->encode($key, $encode),
+			'iv' => $this->encode($iv, $encode),
+			'data' => $this->encode($encrypted_item, $encode)
+			);
+	}
+
+	/**
+	* This method is used to decrypt a string.
+	*
+	* We do not do anything exciting here. Just a call to a php function loaded with
+	* a few predefined params and the passed in values as params.
+	*
+	* @param string $item An enctryed string
+	* @param binary $iv initialization vector
+	* @param string $key A string contianing the encryption key for $item
+	* @return string The decrypted $item
+	*/
+	public function decrypt($item, $iv, $key, $encode=BIN ,$cipher=MCRYPT_RIJNDAEL_128, $mode=MCRYPT_MODE_CFB)
+	{
+		return mcrypt_decrypt($cipher, 
+							  $this->decode($key, $encode),
+							  $this->decode($item, $encode),
+							  $mode,
+							  $this->decode($iv, $encode));
+	}
+
+	/**
 	* This methdo generates an entryption key
 	*
 	* We first get the key size of the MCRYPT_RIJNDAEL_128 algorithm by calling
@@ -66,39 +107,42 @@ class BiCrypt {
 	}
 
 	/**
-	* Will create an encypted string
+	* We encode a binary string using either hex or base64 or we return the binary.
 	*
-	* This method will create the key, iv, and encrypted string. This process is expected 
-	*
-	* @param string $item The password or item you want to encrypt
-	* @return array An array includeding the the encryption key, the iv, and the encrypted item
+	* @param string $item The item to be encoded
+	* @param string #encode The encodeing you use for encryption
+	* @return string the encoded $item
 	*/
-	public function encrypt($item, $cipher=MCRYPT_RIJNDAEL_128, $mode=MCRYPT_MODE_CFB)
+	private function encode($item, $encode)
 	{
-		$key = $this->generate_key($cipher, $mode);
-		$iv = $this->generate_initialisation_vector($cipher, $mode);
-		$encrypted_item = mcrypt_encrypt($cipher, $key, $item, $mode, $iv);
-
-		return array(
-			'key' => $key,
-			'iv' => $iv,
-			'data' => $encrypted_item
-			);
+		switch($encode)
+		{
+			case BIN:
+				return $item;
+			case HEX:
+				return bin2hex($item);
+			case BASE64:
+				return base64_encode($item);
+		}
 	}
 
 	/**
-	* This method is used to decrypt a string.
+	* We decode a binary string using either hex or base64 or we return the binary.
 	*
-	* We do not do anything exciting here. Just a call to a php function loaded with
-	* a few predefined params and the passed in values as params.
-	*
-	* @param string $item An enctryed string
-	* @param binary $iv initialization vector
-	* @param string $key A string contianing the encryption key for $item
-	* @return string The decrypted $item
+	* @param string $item The item to be decoded
+	* @param string #encode The encodeing you use for encryption
+	* @return string the decoded $item
 	*/
-	public function decrypt($item, $iv, $key, $cipher=MCRYPT_RIJNDAEL_128, $mode=MCRYPT_MODE_CFB)
+	private function decode($item, $encode)
 	{
-		return mcrypt_decrypt($cipher, $key, $item, $mode, $iv);
+		switch($encode)
+		{
+			case BIN:
+				return $item;
+			case HEX:
+				return hex2bin($item);
+			case BASE64:
+				return base64_decode($item);
+		}
 	}
 }
