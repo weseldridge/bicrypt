@@ -15,11 +15,6 @@
 */
 class BiCrypt {
 
-	/**
-	* I have a few things to expand the capablity of this class.
-	*
-	* @todo Add support for different algorithm and modes.
-	*/
 	
 	function __construct()
 	{
@@ -39,9 +34,9 @@ class BiCrypt {
 	* @param void
 	* @return string A pseudo-random string of bytes	
 	*/
-	private function generate_key()
+	private function generate_key($cipher, $mode)
 	{
-		$size = mcrypt_get_key_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CFB);
+		$size = mcrypt_get_key_size($cipher, $mode);
 		$key = openssl_random_pseudo_bytes($size, $strong);
 
 		if(($key == false) || ($strong == false))
@@ -62,9 +57,9 @@ class BiCrypt {
 	* @param void
 	* @return binary an initialization vector (IV)
 	*/
-	private function generate_initialisation_vector()
+	private function generate_initialisation_vector($cipher, $mode)
 	{
-		$size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CFB);
+		$size = mcrypt_get_iv_size($cipher, $mode);
 		$iv = mcrypt_create_iv($size, MCRYPT_DEV_URANDOM);
 		return $iv; 
 
@@ -78,11 +73,11 @@ class BiCrypt {
 	* @param string $item The password or item you want to encrypt
 	* @return array An array includeding the the encryption key, the iv, and the encrypted item
 	*/
-	public function encrypt($item)
+	public function encrypt($item, $cipher=MCRYPT_RIJNDAEL_128, $mode=MCRYPT_MODE_CFB)
 	{
-		$key = $this->generate_key();
-		$iv = $this->generate_initialisation_vector();
-		$encrypted_item = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $item, MCRYPT_MODE_CFB, $iv);
+		$key = $this->generate_key($cipher, $mode);
+		$iv = $this->generate_initialisation_vector($cipher, $mode);
+		$encrypted_item = mcrypt_encrypt($cipher, $key, $item, $mode, $iv);
 
 		return array(
 			'key' => $key,
@@ -102,8 +97,8 @@ class BiCrypt {
 	* @param string $key A string contianing the encryption key for $item
 	* @return string The decrypted $item
 	*/
-	public function decrypt($item, $iv, $key)
+	public function decrypt($item, $iv, $key, $cipher=MCRYPT_RIJNDAEL_128, $mode=MCRYPT_MODE_CFB)
 	{
-		return mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $key, $item, MCRYPT_MODE_CFB, $iv);
+		return mcrypt_decrypt($cipher, $key, $item, $mode, $iv);
 	}
 }

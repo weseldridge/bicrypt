@@ -43,7 +43,7 @@
 				<h3>Printed using base64</h3>
  				<dl class="dl-horizontal">
 					<?php
-					$password = 'Password123';
+					$password = 'Ihaveanewphone';
 					$obj = new BiCrypt();
 					$encrypted_string = $obj->encrypt($password);
 					$decrypted_string = $obj->decrypt($encrypted_string['data'],$encrypted_string['iv'],$encrypted_string['key']);
@@ -68,7 +68,7 @@
  				<dl class="dl-horizontal">
 					<h3>Printed using hex</h3>
 					<?php
-					$password = 'Password123';
+					$password = 'ThisCouldBeBetter!';
 					$obj = new BiCrypt();
 					$encrypted_string = $obj->encrypt($password);
 					$decrypted_string = $obj->decrypt($encrypted_string['data'],$encrypted_string['iv'],$encrypted_string['key']);
