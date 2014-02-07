@@ -1,6 +1,6 @@
 <?php
 /**
-* This class is build as a utility class. Its sole propuse is to assiste
+* This class is built as a utility class. Its sole propuse is to assiste
 * in encrypting and decrypting strings. You have two public methods that
 * take a string as its parameters. 
 *
@@ -21,6 +21,11 @@ class BiCrypt {
 	* @todo Add support for different algorithm and modes.
 	*/
 	
+	function __construct()
+	{
+
+	}
+
 	/**
 	* This methdo generates an entryption key
 	*
@@ -60,7 +65,9 @@ class BiCrypt {
 	private function generate_initialisation_vector()
 	{
 		$size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CFB);
-		return mcrypt_create_iv($size, MCRYPT_DEV_URANDOM);
+		$iv = mcrypt_create_iv($size, MCRYPT_DEV_URANDOM);
+		return $iv; 
+
 	}
 
 	/**
@@ -74,7 +81,7 @@ class BiCrypt {
 	public function encrypt($item)
 	{
 		$key = $this->generate_key();
-		$iv = $generate_initialisation_vector();
+		$iv = $this->generate_initialisation_vector();
 		$encrypted_item = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $item, MCRYPT_MODE_CFB, $iv);
 
 		return array(
